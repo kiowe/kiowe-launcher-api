@@ -76,9 +76,9 @@ func (s *GameShopListStorage) Add(dto *core.CreateGameDTO) error {
                   system_requirements, age_limit, description, release_date, version, rating)
                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
 
-	if err := s.pool.QueryRow(context.Background(), sql, &dto.Name,
+	if _, err := s.pool.Exec(context.Background(), sql, &dto.Name,
 		&dto.Price, &dto.IdDevelopers, &dto.IdPublishers, &dto.IdCategories, &dto.SystemReq,
-		&dto.AgeLimit, &dto.Description, &dto.ReleaseDate, &dto.Version, &dto.Rating).Scan(); err != nil {
+		&dto.AgeLimit, &dto.Description, &dto.ReleaseDate, &dto.Version, &dto.Rating); err != nil {
 		if err := utils.ParsePgError(err); err != nil {
 			log.Printf("[ERROR]: %v", err)
 			return err
@@ -88,4 +88,25 @@ func (s *GameShopListStorage) Add(dto *core.CreateGameDTO) error {
 	}
 
 	return nil
+}
+
+func (s *GameShopListStorage) Delete(id int) error {
+	sql := `DELETE FROM games WHERE id = $1`
+
+	if _, err := s.pool.Exec(context.Background(), sql, id); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			log.Printf("[ERROR]: %v", err)
+			return err
+		}
+		log.Printf("[QUERY ERROR]: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func (s *GameShopListStorage) Update(id int, dto *core.UpdateGameDTO) (*core.Game, error) {
+	//sql := `UPDATE games SET name = $2, price = $3, id_developers WHERE id = $1`
+
+	return nil, nil
 }

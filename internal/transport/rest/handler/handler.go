@@ -26,10 +26,10 @@ func (h *Handler) Init() *fiber.App {
 	v1 := api.Group("/v1")
 	game := v1.Group("/game")
 
-	game.Get("/", h.GameShopListHandler.GetAll)
+	game.Get("/all", h.GameShopListHandler.GetAll)
 	game.Get("/:id", h.GameShopListHandler.GetOne)
 	game.Post("/add", h.GameShopListHandler.Add)
-	game.Patch("/:id", h.GameShopListHandler.GetOne)
-	game.Delete("/:id", h.GameShopListHandler.GetOne)
+	game.Patch("/:id", h.GameShopListHandler.Update)
+	game.Delete("/:id", h.GameShopListHandler.Delete)
 	return h.app
 }

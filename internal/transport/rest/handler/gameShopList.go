@@ -9,6 +9,8 @@ type GameShopListService interface {
 	GetOne(id int) (*core.Game, error)
 	GetAll() ([]*core.Game, error)
 	Add(dto *core.CreateGameDTO) error
+	Delete(id int) error
+	Update(id int, dto *core.UpdateGameDTO) (*core.Game, error)
 }
 
 type GameShopListHandler struct {
@@ -66,4 +68,49 @@ func (h *GameShopListHandler) Add(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"msg": "Game was added.",
 	})
+}
+
+func (h *GameShopListHandler) Delete(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	if err := h.service.Delete(id); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"msg": "Game was deleted.",
+	})
+}
+
+func (h *GameShopListHandler) Update(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	newGame := new(core.UpdateGameDTO)
+
+	if err := c.BodyParser(newGame); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	oldGame, err := h.service.Update(id, newGame)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(oldGame)
 }
