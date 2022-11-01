@@ -6,3 +6,12 @@ POST   http://localhost:8081/api/v1/game/add
 PATCH  http://localhost:8081/api/v1/game/:id
 DELETE http://localhost:8081/api/v1/game/:id
 
+user service
+GET    http://localhost:8081/api/v1/user/:id
+GET    http://localhost:8081/api/v1/user/:id/friends
+GET    http://localhost:8081/api/v1/user/:id/groups
+GET    http://localhost:8081/api/v1/user/:id/library
+POST   http://localhost:8081/api/v1/user/signup
+POST   http://localhost:8081/api/v1/user/signin
+PATCH  http://localhost:8081/api/v1/user/:id
+DELETE http://localhost:8081/api/v1/user/:id
