@@ -8,6 +8,7 @@ import (
 type GameShopListService interface {
 	GetOne(id int) (*core.Game, error)
 	GetAll() ([]*core.Game, error)
+	Add(dto *core.CreateGameDTO) error
 }
 
 type GameShopListHandler struct {
@@ -47,6 +48,22 @@ func (h *GameShopListHandler) GetAll(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(games)
 }
 
-func (h *GameShopListHandler) AddOne(c *fiber.Ctx) error {
+func (h *GameShopListHandler) Add(c *fiber.Ctx) error {
+	game := new(core.CreateGameDTO)
 
+	if err := c.BodyParser(game); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	if err := h.service.Add(game); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"msg": "Game was added.",
+	})
 }

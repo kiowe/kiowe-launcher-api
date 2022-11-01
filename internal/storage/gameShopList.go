@@ -70,3 +70,22 @@ func (s *GameShopListStorage) GetAll() ([]*core.Game, error) {
 
 	return games, nil
 }
+
+func (s *GameShopListStorage) Add(dto *core.CreateGameDTO) error {
+	sql := `INSERT INTO games(name, price, id_developers, id_publishers, id_categories, 
+                  system_requirements, age_limit, description, release_date, version, rating)
+                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
+
+	if err := s.pool.QueryRow(context.Background(), sql, &dto.Name,
+		&dto.Price, &dto.IdDevelopers, &dto.IdPublishers, &dto.IdCategories, &dto.SystemReq,
+		&dto.AgeLimit, &dto.Description, &dto.ReleaseDate, &dto.Version, &dto.Rating).Scan(); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			log.Printf("[ERROR]: %v", err)
+			return err
+		}
+		log.Printf("[QUERY ERROR]: %v", err)
+		return err
+	}
+
+	return nil
+}
