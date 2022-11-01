@@ -1,0 +1,12 @@
+DROP TABLE IF EXISTS users_friends;
+DROP TABLE IF EXISTS games_purchases;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS users_libraries;
+DROP TABLE IF EXISTS users_wish_lists;
+DROP TABLE IF EXISTS games;
+DROP TABLE IF EXISTS purchases_cheques;
+DROP TABLE IF EXISTS games_developers;
+DROP TABLE IF EXISTS games_publishers;
+DROP TABLE IF EXISTS games_categories;
+DROP TABLE IF EXISTS users_groups;
+DROP TABLE IF EXISTS users_statuses;
