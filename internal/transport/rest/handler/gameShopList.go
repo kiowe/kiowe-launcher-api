@@ -1,9 +1,13 @@
 package handler
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+	"github.com/kiowe/kiowe-launcher-api/internal/core"
+)
 
 type GameShopListService interface {
-	GetOne(id int) error
+	GetOne(id int) (*core.Game, error)
+	GetAll() ([]*core.Game, error)
 }
 
 type GameShopListHandler struct {
@@ -15,5 +19,34 @@ func NewGameShopListHandler(s GameShopListService) *GameShopListHandler {
 }
 
 func (h *GameShopListHandler) GetOne(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{"msg": "sdfsdf"})
+	id, err := c.ParamsInt("id")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	game, err := h.service.GetOne(id)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(game)
+}
+
+func (h *GameShopListHandler) GetAll(c *fiber.Ctx) error {
+	games, err := h.service.GetAll()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(games)
+}
+
+func (h *GameShopListHandler) AddOne(c *fiber.Ctx) error {
+
 }

@@ -8,7 +8,7 @@ type Game struct {
 	Price        float64     `json:"price"`
 	IdDevelopers int         `json:"id_developers"`
 	IdPublishers int         `json:"id_publishers"`
-	IdCategories int         `json:"id_categories"`
+	IdCategories *int        `json:"id_categories,omitempty"`
 	SystemReq    string      `json:"system_req"`
 	AgeLimit     string      `json:"age_limit"`
 	Description  *string     `json:"description,omitempty"`
