@@ -105,7 +105,7 @@ func (s *GameShopListStorage) Delete(id int) error {
 	return nil
 }
 
-func (s *GameShopListStorage) Update(id int, dto *core.UpdateGameDTO) (*core.Game, error) {
+func (s *GameShopListStorage) Update(id int, new *core.UpdateGameDTO, old *core.Game) (*core.Game, error) {
 	//sql := `UPDATE games SET name = $2, price = $3, id_developers WHERE id = $1`
 
 	return nil, nil

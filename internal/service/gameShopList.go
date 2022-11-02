@@ -7,7 +7,7 @@ type GameShopListStorage interface {
 	GetAll() ([]*core.Game, error)
 	Add(dto *core.CreateGameDTO) error
 	Delete(id int) error
-	Update(id int, dto *core.UpdateGameDTO) (*core.Game, error)
+	Update(id int, new *core.UpdateGameDTO, old *core.Game) (*core.Game, error)
 }
 
 type GameShopListService struct {
@@ -37,5 +37,14 @@ func (s *GameShopListService) Delete(id int) error {
 }
 
 func (s *GameShopListService) Update(id int, dto *core.UpdateGameDTO) (*core.Game, error) {
-	return s.storage.Update(id, dto)
+	game, err := s.storage.GetOne(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if dto.Name != "" {
+		game.Name = dto.Name
+	}
+
+	return s.storage.Update(id, dto, game)
 }
