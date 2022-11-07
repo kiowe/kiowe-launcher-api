@@ -1,11 +1,8 @@
 package handler
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/kiowe/kiowe-launcher-api/internal/core"
-	"log"
 )
 
 type GameShopListService interface {
@@ -93,34 +90,27 @@ func (h *GameShopListHandler) Delete(c *fiber.Ctx) error {
 }
 
 func (h *GameShopListHandler) Update(c *fiber.Ctx) error {
-	//id, err := c.ParamsInt("id")
-	//if err != nil {
-	//	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-	//		"error": err.Error(),
-	//	})
-	//}
-
-	newGame := new(core.UpdateGameDTO)
-
-	if err := c.BodyParser(newGame); err != nil {
+	id, err := c.ParamsInt("id")
+	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	//oldGame, err := h.service.Update(id, newGame)
-	//if err != nil {
-	//	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-	//		"error": err.Error(),
-	//	})
-	//}
+	game := new(core.UpdateGameDTO)
 
-	var partialData map[string]interface{}
-	if err := json.Unmarshal(c.Body(), &partialData); err != nil {
-		log.Fatal(err)
+	if err := c.BodyParser(game); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
 	}
 
-	fmt.Printf("%s", fmt.Sprintf("%s", partialData))
+	newGame, err := h.service.Update(id, game)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
 
-	return c.Status(fiber.StatusOK).JSON(partialData)
+	return c.Status(fiber.StatusOK).JSON(newGame)
 }

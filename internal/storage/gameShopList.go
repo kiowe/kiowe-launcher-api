@@ -2,10 +2,12 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/kiowe/kiowe-launcher-api/internal/core"
 	"github.com/kiowe/kiowe-launcher-api/pkg/utils"
 	"log"
+	"strings"
 )
 
 type GameShopListStorage struct {
@@ -105,8 +107,73 @@ func (s *GameShopListStorage) Delete(id int) error {
 	return nil
 }
 
-func (s *GameShopListStorage) Update(id int, new *core.UpdateGameDTO, old *core.Game) (*core.Game, error) {
-	//sql := `UPDATE games SET name = $2, price = $3, id_developers WHERE id = $1`
+type tsk struct {
+	column  []string
+	element []interface{}
+}
 
-	return nil, nil
+func newTsk() *tsk {
+	return &tsk{
+		column:  make([]string, 0),
+		element: make([]interface{}, 0),
+	}
+}
+
+func (tsk *tsk) addColumn(name string, value interface{}) {
+	tsk.column = append(tsk.column, fmt.Sprintf("%s = $%d", name, len(tsk.column)+1))
+	tsk.element = append(tsk.element, value)
+}
+
+func (tsk *tsk) joinColEl() string {
+
+	return strings.Join(tsk.column, ", ")
+}
+
+func (tsk *tsk) getValue() []interface{} {
+	return tsk.element
+}
+
+func (s *GameShopListStorage) Update(id int, new *core.UpdateGameDTO) (*core.Game, error) {
+	hgh := newTsk()
+
+	if new.Name != nil {
+		hgh.addColumn("name", new.Name)
+	}
+	if new.Price != nil {
+		hgh.addColumn("price", new.Price)
+	}
+	if new.AgeLimit != nil {
+		hgh.addColumn("age_limit", new.AgeLimit)
+	}
+
+	fmt.Println(hgh.joinColEl())
+
+	// TODO add where id
+	q := `UPDATE games SET ` + hgh.joinColEl() + `RETURNING *`
+
+	game := core.Game{}
+
+	if err := s.pool.QueryRow(context.Background(), q, hgh.getValue()...).Scan(
+		&game.Id,
+		&game.Name,
+		&game.Price,
+		&game.IdDevelopers,
+		&game.IdPublishers,
+		&game.IdCategories,
+		&game.SystemReq,
+		&game.AgeLimit,
+		&game.Description,
+		&game.ReleaseDate,
+		&game.Version,
+		&game.Rating,
+	); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			log.Printf("[ERROR]: %v", err)
+			return nil, err
+		}
+		log.Printf("[QUERY ERROR]: %v", err)
+		return nil, err
+	}
+
+	return &game, nil
 }
