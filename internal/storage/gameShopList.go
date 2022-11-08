@@ -2,12 +2,10 @@ package storage
 
 import (
 	"context"
-	"fmt"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/kiowe/kiowe-launcher-api/internal/core"
 	"github.com/kiowe/kiowe-launcher-api/pkg/utils"
 	"log"
-	"strings"
 )
 
 type GameShopListStorage struct {
@@ -26,9 +24,20 @@ func (s *GameShopListStorage) GetOne(id int) (*core.Game, error) {
 
 	game := core.Game{}
 
-	if err := s.pool.QueryRow(context.Background(), sql, id).Scan(&game.Id, &game.Name,
-		&game.Price, &game.IdDevelopers, &game.IdPublishers, &game.IdCategories, &game.SystemReq,
-		&game.AgeLimit, &game.Description, &game.ReleaseDate, &game.Version, &game.Rating); err != nil {
+	if err := s.pool.QueryRow(context.Background(), sql, id).Scan(
+		&game.Id,
+		&game.Name,
+		&game.Price,
+		&game.IdDevelopers,
+		&game.IdPublishers,
+		&game.IdCategories,
+		&game.SystemReq,
+		&game.AgeLimit,
+		&game.Description,
+		&game.ReleaseDate,
+		&game.Version,
+		&game.Rating,
+	); err != nil {
 		if err := utils.ParsePgError(err); err != nil {
 			log.Printf("[ERROR]: %v", err)
 			return nil, err
@@ -57,9 +66,20 @@ func (s *GameShopListStorage) GetAll() ([]*core.Game, error) {
 	for rows.Next() {
 		game := core.Game{}
 
-		if err := rows.Scan(&game.Id, &game.Name, &game.Price, &game.IdDevelopers,
-			&game.IdPublishers, &game.IdCategories, &game.SystemReq, &game.AgeLimit,
-			&game.Description, &game.ReleaseDate, &game.Version, &game.Rating); err != nil {
+		if err := rows.Scan(
+			&game.Id,
+			&game.Name,
+			&game.Price,
+			&game.IdDevelopers,
+			&game.IdPublishers,
+			&game.IdCategories,
+			&game.SystemReq,
+			&game.AgeLimit,
+			&game.Description,
+			&game.ReleaseDate,
+			&game.Version,
+			&game.Rating,
+		); err != nil {
 			return nil, err
 		}
 
@@ -78,9 +98,19 @@ func (s *GameShopListStorage) Add(dto *core.CreateGameDTO) error {
                   system_requirements, age_limit, description, release_date, version, rating)
                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
 
-	if _, err := s.pool.Exec(context.Background(), sql, &dto.Name,
-		&dto.Price, &dto.IdDevelopers, &dto.IdPublishers, &dto.IdCategories, &dto.SystemReq,
-		&dto.AgeLimit, &dto.Description, &dto.ReleaseDate, &dto.Version, &dto.Rating); err != nil {
+	if _, err := s.pool.Exec(context.Background(), sql,
+		&dto.Name,
+		&dto.Price,
+		&dto.IdDevelopers,
+		&dto.IdPublishers,
+		&dto.IdCategories,
+		&dto.SystemReq,
+		&dto.AgeLimit,
+		&dto.Description,
+		&dto.ReleaseDate,
+		&dto.Version,
+		&dto.Rating,
+	); err != nil {
 		if err := utils.ParsePgError(err); err != nil {
 			log.Printf("[ERROR]: %v", err)
 			return err
@@ -107,53 +137,48 @@ func (s *GameShopListStorage) Delete(id int) error {
 	return nil
 }
 
-type tsk struct {
-	column  []string
-	element []interface{}
-}
-
-func newTsk() *tsk {
-	return &tsk{
-		column:  make([]string, 0),
-		element: make([]interface{}, 0),
-	}
-}
-
-func (tsk *tsk) addColumn(name string, value interface{}) {
-	tsk.column = append(tsk.column, fmt.Sprintf("%s = $%d", name, len(tsk.column)+1))
-	tsk.element = append(tsk.element, value)
-}
-
-func (tsk *tsk) joinColEl() string {
-
-	return strings.Join(tsk.column, ", ")
-}
-
-func (tsk *tsk) getValue() []interface{} {
-	return tsk.element
-}
-
 func (s *GameShopListStorage) Update(id int, new *core.UpdateGameDTO) (*core.Game, error) {
-	hgh := newTsk()
+	hgh := utils.NewTsk()
 
 	if new.Name != nil {
-		hgh.addColumn("name", new.Name)
+		hgh.AddColumn("name", new.Name)
 	}
 	if new.Price != nil {
-		hgh.addColumn("price", new.Price)
+		hgh.AddColumn("price", new.Price)
+	}
+	if new.IdDevelopers != nil {
+		hgh.AddColumn("id_developers", new.IdDevelopers)
+	}
+	if new.IdPublishers != nil {
+		hgh.AddColumn("id_publishers", new.IdPublishers)
+	}
+	if new.IdCategories != nil {
+		hgh.AddColumn("id_categories", new.IdCategories)
+	}
+	if new.SystemReq != nil {
+		hgh.AddColumn("system_req", new.SystemReq)
 	}
 	if new.AgeLimit != nil {
-		hgh.addColumn("age_limit", new.AgeLimit)
+		hgh.AddColumn("age_limit", new.AgeLimit)
+	}
+	if new.Description != nil {
+		hgh.AddColumn("description", new.Description)
+	}
+	if new.ReleaseDate != nil {
+		hgh.AddColumn("release_date", new.ReleaseDate)
+	}
+	if new.Version != nil {
+		hgh.AddColumn("version", new.Version)
+	}
+	if new.Rating != nil {
+		hgh.AddColumn("rating", new.Rating)
 	}
 
-	fmt.Println(hgh.joinColEl())
-
-	// TODO add where id
-	q := `UPDATE games SET ` + hgh.joinColEl() + `RETURNING *`
+	q := `UPDATE games SET ` + hgh.JoinColEl("id", id) + `RETURNING *`
 
 	game := core.Game{}
 
-	if err := s.pool.QueryRow(context.Background(), q, hgh.getValue()...).Scan(
+	if err := s.pool.QueryRow(context.Background(), q, hgh.GetValue()...).Scan(
 		&game.Id,
 		&game.Name,
 		&game.Price,

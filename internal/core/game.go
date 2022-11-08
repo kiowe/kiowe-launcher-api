@@ -33,20 +33,6 @@ type CreateGameDTO struct {
 	Rating       float64 `form:"rating"`
 }
 
-//type UpdateGameDTO struct {
-//	Name         string  `form:"name,omitempty"`
-//	Price        float64 `form:"price,omitempty"`
-//	IdDevelopers int     `form:"id_developers,omitempty"`
-//	IdPublishers int     `form:"id_publishers,omitempty"`
-//	IdCategories int     `form:"id_categories,omitempty"`
-//	SystemReq    string  `form:"system_req,omitempty"`
-//	AgeLimit     string  `form:"age_limit,omitempty"`
-//	Description  string  `form:"description,omitempty"`
-//	ReleaseDate  string  `form:"release_date,omitempty"`
-//	Version      string  `form:"version,omitempty"`
-//	Rating       float64 `form:"rating,omitempty"`
-//}
-
 type UpdateGameDTO struct {
 	Name         *string  `json:"name,omitempty"`
 	Price        *float64 `json:"price,omitempty"`

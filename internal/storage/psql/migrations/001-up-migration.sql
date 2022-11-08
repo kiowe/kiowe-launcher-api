@@ -18,17 +18,13 @@ CREATE TABLE IF NOT EXISTS games_categories
     description VARCHAR(300) NULL
 );
 
-CREATE TABLE IF NOT EXISTS games_developers
+CREATE TABLE IF NOT EXISTS dev_pub_account
 (
     id          INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    name        VARCHAR(50)  NOT NULL UNIQUE,
-    description VARCHAR(300) NULL
-);
-
-CREATE TABLE IF NOT EXISTS games_publishers
-(
-    id          INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    name        VARCHAR(50)  NOT NULL UNIQUE,
+    login       VARCHAR(26)  NOT NULL UNIQUE,
+    password    VARCHAR(48)  NOT NULL UNIQUE,
+    email       VARCHAR(64)  NOT NULL UNIQUE,
+    name        VARCHAR(64)  NOT NULL,
     description VARCHAR(300) NULL
 );
 
@@ -37,8 +33,8 @@ CREATE TABLE IF NOT EXISTS games
     id                  INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     name                VARCHAR(60)  NOT NULL,
     price               DECIMAL      NOT NULL CHECK (price >= 0),
-    id_developers       INT          NOT NULL REFERENCES games_developers (id) ON DELETE CASCADE,
-    id_publishers       INT          NOT NULL REFERENCES games_publishers (id) ON DELETE CASCADE,
+    id_developers       INT          NOT NULL REFERENCES dev_pub_account (id) ON DELETE CASCADE,
+    id_publishers       INT          NOT NULL REFERENCES dev_pub_account (id) ON DELETE CASCADE,
     id_categories       INT          NULL REFERENCES games_categories (id) ON DELETE SET NULL,
     system_requirements VARCHAR(300) NOT NULL,
     age_limit           VARCHAR(3)   NOT NULL,
@@ -70,7 +66,7 @@ CREATE TABLE IF NOT EXISTS users
 (
     id                INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     login             VARCHAR(26)  NOT NULL UNIQUE,
-    password          VARCHAR(48)  NOT NULL,
+    password          VARCHAR(48)  NOT NULL UNIQUE,
     email             VARCHAR(64)  NOT NULL UNIQUE,
     phone_number      VARCHAR(20)  NULL UNIQUE,
     nickname          VARCHAR(90)  NOT NULL,
