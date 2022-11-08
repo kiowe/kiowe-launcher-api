@@ -25,14 +25,14 @@ func (h *GameShopListHandler) GetOne(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": err.Error(),
+			"GETONE::[ERROR]": err.Error(),
 		})
 	}
 
 	game, err := h.service.GetOne(id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
+			"GETONE::[ERROR]": err.Error(),
 		})
 	}
 
@@ -43,7 +43,7 @@ func (h *GameShopListHandler) GetAll(c *fiber.Ctx) error {
 	games, err := h.service.GetAll()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
+			"GETALL::[ERROR]": err.Error(),
 		})
 	}
 
@@ -55,18 +55,18 @@ func (h *GameShopListHandler) Add(c *fiber.Ctx) error {
 
 	if err := c.BodyParser(game); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": err.Error(),
+			"ADD::[ERROR]": err.Error(),
 		})
 	}
 
 	if err := h.service.Add(game); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
+			"ADD::[ERROR]": err.Error(),
 		})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"msg": "Game was added.",
+		"ADD::[OK]": "Game was added.",
 	})
 }
 
@@ -74,18 +74,18 @@ func (h *GameShopListHandler) Delete(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": err.Error(),
+			"DELETE::[ERROR]": err.Error(),
 		})
 	}
 
 	if err := h.service.Delete(id); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
+			"DELETE::[ERROR]": err.Error(),
 		})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"msg": "Game was deleted.",
+		"DELETE::[OK]": "Game was deleted.",
 	})
 }
 
@@ -93,7 +93,7 @@ func (h *GameShopListHandler) Update(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": err.Error(),
+			"UPDATE::[ERROR]": err.Error(),
 		})
 	}
 
@@ -101,16 +101,19 @@ func (h *GameShopListHandler) Update(c *fiber.Ctx) error {
 
 	if err := c.BodyParser(game); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": err.Error(),
+			"UPDATE::[ERROR]": err.Error(),
 		})
 	}
 
 	newGame, err := h.service.Update(id, game)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
+			"UPDATE::[ERROR]": err.Error(),
 		})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(newGame)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"UPDATE::[OK]": "Game was updated",
+		"New table:":   newGame,
+	})
 }

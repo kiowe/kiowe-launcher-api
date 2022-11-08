@@ -28,11 +28,13 @@ func (a *App) Run() {
 
 	log.Println("Services initializing...")
 	services := service.New(service.Deps{
+		DevSignupStorage:    storages.DevSignupStorage,
 		GameShopListStorage: storages.GameShopListStorage,
 	})
 
 	log.Println("Handlers initializing...")
 	restHandlers := handler.New(handler.Deps{
+		DevSignupService:    services.DevSignupService,
 		GameShopListService: services.GameShopListService,
 	})
 
