@@ -20,17 +20,17 @@ type Game struct {
 }
 
 type CreateGameDTO struct {
-	Name         string  `form:"name"`
-	Price        float64 `form:"price"`
-	IdDevelopers int     `form:"id_developers"`
-	IdPublishers int     `form:"id_publishers"`
-	IdCategories *int    `form:"id_categories,omitempty"`
-	SystemReq    string  `form:"system_req"`
-	AgeLimit     string  `form:"age_limit"`
-	Description  *string `form:"description,omitempty"`
-	ReleaseDate  string  `form:"release_date"`
-	Version      string  `form:"version"`
-	Rating       float64 `form:"rating"`
+	Name         string  `json:"name"`
+	Price        float64 `json:"price"`
+	IdDevelopers int     `json:"id_developers"`
+	IdPublishers int     `json:"id_publishers"`
+	IdCategories *int    `json:"id_categories,omitempty"`
+	SystemReq    string  `json:"system_req"`
+	AgeLimit     string  `json:"age_limit"`
+	Description  *string `json:"description,omitempty"`
+	ReleaseDate  string  `json:"release_date"`
+	Version      string  `json:"version"`
+	Rating       float64 `json:"rating"`
 }
 
 type UpdateGameDTO struct {

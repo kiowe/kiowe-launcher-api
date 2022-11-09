@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS dev_pub_account
 (
     id          INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     login       VARCHAR(26)  NOT NULL UNIQUE,
-    password    VARCHAR(48)  NOT NULL UNIQUE,
+    password    VARCHAR(64)  NOT NULL UNIQUE,
     email       VARCHAR(64)  NOT NULL UNIQUE,
     name        VARCHAR(64)  NOT NULL,
     description VARCHAR(300) NULL

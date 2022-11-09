@@ -8,3 +8,11 @@ type DevPubAccount struct {
 	Name        string  `json:"name"`
 	Description *string `json:"description,omitempty"`
 }
+
+type DevPubAccountDTO struct {
+	Login       string  `json:"login"`
+	Password    string  `json:"password"`
+	Email       string  `json:"email"`
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
+}
