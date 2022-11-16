@@ -17,10 +17,7 @@ func NewDevSignupStorage(pool *pgxpool.Pool) *DevSignupStorage {
 }
 
 func (s *DevSignupStorage) GetByLogin(login string) (bool, error) {
-	//sql := `SELECT id, login, password, email, name, description FROM dev_pub_account WHERE login = $1`
-	sql := `select exists(select * from dev_pub_account where login = $1)`
-
-	//devAcc := core.DevPubAccount{}
+	sql := `SELECT EXISTS(SELECT * FROM dev_pub_account WHERE login = $1)`
 
 	isExist := false
 
@@ -38,22 +35,41 @@ func (s *DevSignupStorage) GetByLogin(login string) (bool, error) {
 	return isExist, nil
 }
 
-func (s *DevSignupStorage) Create(dto *core.DevPubAccountDTO) error {
-	sql := `INSERT INTO dev_pub_account(login, password, email, name, description) VALUES($1, $2, $3, $4, $5)`
+func (s *DevSignupStorage) Create(dto *core.DevPubAccountDTO) (int, error) {
+	sql := `INSERT INTO dev_pub_account(login, password, email, name, description) VALUES($1, $2, $3, $4, $5) RETURNING id`
 
-	if _, err := s.pool.Exec(context.Background(), sql,
+	var id int
+
+	if err := s.pool.QueryRow(context.Background(), sql,
 		&dto.Login,
 		&dto.Password,
 		&dto.Email,
 		&dto.Name,
-		&dto.Description); err != nil {
+		&dto.Description).Scan(&id); err != nil {
 		if err := utils.ParsePgError(err); err != nil {
 			log.Printf("[ERROR]: %v", err)
-			return err
+			return 0, err
 		}
 		log.Printf("[QUERY ERROR]: %v", err)
-		return err
+		return 0, err
 	}
 
-	return nil
+	return id, nil
+}
+
+func (s *DevSignupStorage) GetPwByLogin(login string) (*core.DevPubAccPw, error) {
+	sql := `SELECT id, password FROM dev_pub_account WHERE login = $1`
+
+	devPubAccPw := core.DevPubAccPw{}
+
+	if err := s.pool.QueryRow(context.Background(), sql, &login).Scan(&devPubAccPw.Id, &devPubAccPw.Password); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			log.Printf("[ERROR]: %v", err)
+			return nil, err
+		}
+		log.Printf("[QUERY ERROR]: %v", err)
+		return nil, err
+	}
+
+	return &devPubAccPw, nil
 }

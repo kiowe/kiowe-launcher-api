@@ -3,12 +3,14 @@ package handler
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/kiowe/kiowe-launcher-api/internal/core"
+	"github.com/kiowe/kiowe-launcher-api/pkg/utils"
+	"time"
 )
 
 type GameShopListService interface {
 	GetOne(id int) (*core.Game, error)
 	GetAll() ([]*core.Game, error)
-	Add(dto *core.CreateGameDTO) error
+	Add(dto *core.CreateGame) error
 	Delete(id int) error
 	Update(id int, dto *core.UpdateGameDTO) (*core.Game, error)
 }
@@ -22,6 +24,21 @@ func NewGameShopListHandler(s GameShopListService) *GameShopListHandler {
 }
 
 func (h *GameShopListHandler) GetOne(c *fiber.Ctx) error {
+	now := time.Now().Unix()
+
+	claims, err := utils.ExtractTokenMetadata(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"GETONE::[ERROR]": err.Error(),
+		})
+	}
+
+	if now > claims.Expires {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"GETONE::[ERROR]": err.Error(),
+		})
+	}
+
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -40,6 +57,21 @@ func (h *GameShopListHandler) GetOne(c *fiber.Ctx) error {
 }
 
 func (h *GameShopListHandler) GetAll(c *fiber.Ctx) error {
+	now := time.Now().Unix()
+
+	claims, err := utils.ExtractTokenMetadata(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"GETALL::[ERROR]": err.Error(),
+		})
+	}
+
+	if now > claims.Expires {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"GETALL::[ERROR]": err.Error(),
+		})
+	}
+
 	games, err := h.service.GetAll()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -51,6 +83,27 @@ func (h *GameShopListHandler) GetAll(c *fiber.Ctx) error {
 }
 
 func (h *GameShopListHandler) Add(c *fiber.Ctx) error {
+	now := time.Now().Unix()
+
+	claims, err := utils.ExtractTokenMetadata(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"ADD::[ERROR]": err.Error(),
+		})
+	}
+
+	if now > claims.Expires {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"ADD::[ERROR]": err.Error(),
+		})
+	}
+
+	if claims.DevPubAcc != true {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"ADD::[ERROR]": err.Error(),
+		})
+	}
+
 	game := new(core.CreateGameDTO)
 
 	if err := c.BodyParser(game); err != nil {
@@ -59,7 +112,21 @@ func (h *GameShopListHandler) Add(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := h.service.Add(game); err != nil {
+	newGame := core.CreateGame{
+		Name:         game.Name,
+		Price:        game.Price,
+		IdDevelopers: claims.Id,
+		IdPublishers: claims.Id,
+		IdCategories: game.IdCategories,
+		SystemReq:    game.SystemReq,
+		AgeLimit:     game.AgeLimit,
+		Description:  game.Description,
+		ReleaseDate:  game.ReleaseDate,
+		Version:      game.Version,
+		Rating:       game.Rating,
+	}
+
+	if err := h.service.Add(&newGame); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"ADD::[ERROR]": err.Error(),
 		})

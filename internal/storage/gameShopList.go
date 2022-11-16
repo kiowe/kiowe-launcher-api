@@ -93,7 +93,7 @@ func (s *GameShopListStorage) GetAll() ([]*core.Game, error) {
 	return games, nil
 }
 
-func (s *GameShopListStorage) Add(dto *core.CreateGameDTO) error {
+func (s *GameShopListStorage) Add(dto *core.CreateGame) error {
 	sql := `INSERT INTO games(name, price, id_developers, id_publishers, id_categories, 
                   system_requirements, age_limit, description, release_date, version, rating)
                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`

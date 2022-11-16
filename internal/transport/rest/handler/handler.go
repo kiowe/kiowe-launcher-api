@@ -2,6 +2,8 @@ package handler
 
 import (
 	"github.com/gofiber/fiber/v2"
+	jwtware "github.com/gofiber/jwt/v3"
+	"github.com/kiowe/kiowe-launcher-api/internal/middleware"
 )
 
 type Deps struct {
@@ -33,6 +35,11 @@ func (h *Handler) Init() *fiber.App {
 	dev.Post("/signin", h.DevSignupHandler.Signin)
 
 	game := v1.Group("/game")
+	game.Use(jwtware.New(jwtware.Config{
+		SigningKey:   []byte("secret"),
+		ErrorHandler: middleware.JwtError,
+	}))
+
 	game.Get("/all", h.GameShopListHandler.GetAll)
 	game.Get("/:id", h.GameShopListHandler.GetOne)
 	game.Post("/add", h.GameShopListHandler.Add)

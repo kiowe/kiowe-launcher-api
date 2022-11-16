@@ -19,11 +19,23 @@ type Game struct {
 	Rating       float64     `json:"rating"`
 }
 
-type CreateGameDTO struct {
+type CreateGame struct {
 	Name         string  `json:"name"`
 	Price        float64 `json:"price"`
 	IdDevelopers int     `json:"id_developers"`
 	IdPublishers int     `json:"id_publishers"`
+	IdCategories *int    `json:"id_categories,omitempty"`
+	SystemReq    string  `json:"system_req"`
+	AgeLimit     string  `json:"age_limit"`
+	Description  *string `json:"description,omitempty"`
+	ReleaseDate  string  `json:"release_date"`
+	Version      string  `json:"version"`
+	Rating       float64 `json:"rating"`
+}
+
+type CreateGameDTO struct {
+	Name         string  `json:"name"`
+	Price        float64 `json:"price"`
 	IdCategories *int    `json:"id_categories,omitempty"`
 	SystemReq    string  `json:"system_req"`
 	AgeLimit     string  `json:"age_limit"`

@@ -7,6 +7,7 @@ import (
 
 type DevSignupService interface {
 	Signup(dto *core.DevPubAccountDTO) (string, error)
+	Signin(dto *core.LoginDevPubAccountDTO) (string, error)
 }
 
 type DevSignupHandler struct {
@@ -39,5 +40,28 @@ func (h *DevSignupHandler) Signup(c *fiber.Ctx) error {
 }
 
 func (h *DevSignupHandler) Signin(c *fiber.Ctx) error {
-	return nil
+	devAcc := new(core.LoginDevPubAccountDTO)
+
+	if err := c.BodyParser(devAcc); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"SIGNIN::[ERROR]": err.Error(),
+		})
+	}
+
+	if devAcc.Login == "" || devAcc.Password == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"SIGNIN::[ERROR]": "Login or password cannot be empty",
+		})
+	}
+
+	token, err := h.service.Signin(devAcc)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"SIGNIN::[ERROR]": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"token": token,
+	})
 }
