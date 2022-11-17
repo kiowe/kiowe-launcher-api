@@ -4,7 +4,7 @@ import "github.com/kiowe/kiowe-launcher-api/internal/core"
 
 type GameShopListStorage interface {
 	GetOne(id int) (*core.Game, error)
-	GetAll() ([]*core.Game, error)
+	GetAll(filter *core.GameFilter) ([]*core.Game, error)
 	Add(dto *core.CreateGame) error
 	Delete(id int) error
 	Update(id int, game *core.UpdateGameDTO) (*core.Game, error)
@@ -22,8 +22,8 @@ func (s *GameShopListService) GetOne(id int) (*core.Game, error) {
 	return s.storage.GetOne(id)
 }
 
-func (s *GameShopListService) GetAll() ([]*core.Game, error) {
-	return s.storage.GetAll()
+func (s *GameShopListService) GetAll(filter *core.GameFilter) ([]*core.Game, error) {
+	return s.storage.GetAll(filter)
 }
 
 func (s *GameShopListService) Add(dto *core.CreateGame) error {

@@ -58,3 +58,16 @@ type UpdateGameDTO struct {
 	Version      *string  `json:"version,omitempty"`
 	Rating       *float64 `json:"rating,omitempty"`
 }
+
+type GameFilter struct {
+	Name         *string  `query:"name"`
+	Price        *float64 `query:"price"`
+	IdDevelopers *int     `query:"id_developers"`
+	IdPublishers *int     `query:"id_publishers"`
+	IdCategories *int     `query:"id_categories"`
+	SystemReq    *string  `query:"system_req"`
+	AgeLimit     *string  `query:"age_limit"`
+	Description  *string  `query:"description"`
+	ReleaseDate  *string  `query:"release_date"`
+	Rating       *float64 `query:"rating"`
+}

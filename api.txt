@@ -1,10 +1,10 @@
 game service
-GET    http://localhost:8081/api/v1/game        - done
-GET    http://localhost:8081/api/v1/game/:id    - done
-GET    http://localhost:8081/api/v1/game?name=el%
-POST   http://localhost:8081/api/v1/game/add    - done
-PATCH  http://localhost:8081/api/v1/game/:id
-DELETE http://localhost:8081/api/v1/game/:id    - done
+GET    http://localhost:8081/api/v1/game/all                                                    - done
+GET    http://localhost:8081/api/v1/game/:id                                                    - done
+GET    http://localhost:8081/api/v1/game/all?name=el%&price=3441&sort_order=price&sort_by=desc
+POST   http://localhost:8081/api/v1/game/add                                                    - done
+PATCH  http://localhost:8081/api/v1/game/:id                                                    - done
+DELETE http://localhost:8081/api/v1/game/:id                                                    - done
 
 user service
 GET    http://localhost:8081/api/v1/user/:id

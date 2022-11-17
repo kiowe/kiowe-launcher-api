@@ -9,7 +9,7 @@ import (
 
 type GameShopListService interface {
 	GetOne(id int) (*core.Game, error)
-	GetAll() ([]*core.Game, error)
+	GetAll(filter *core.GameFilter) ([]*core.Game, error)
 	Add(dto *core.CreateGame) error
 	Delete(id int) error
 	Update(id int, dto *core.UpdateGameDTO) (*core.Game, error)
@@ -72,7 +72,14 @@ func (h *GameShopListHandler) GetAll(c *fiber.Ctx) error {
 		})
 	}
 
-	games, err := h.service.GetAll()
+	filter := new(core.GameFilter)
+	if err := c.QueryParser(filter); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"GETALL::[ERROR]": err.Error(),
+		})
+	}
+
+	games, err := h.service.GetAll(filter)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"GETALL::[ERROR]": err.Error(),
@@ -138,6 +145,27 @@ func (h *GameShopListHandler) Add(c *fiber.Ctx) error {
 }
 
 func (h *GameShopListHandler) Delete(c *fiber.Ctx) error {
+	now := time.Now().Unix()
+
+	claims, err := utils.ExtractTokenMetadata(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"DELETE::[ERROR]": err.Error(),
+		})
+	}
+
+	if now > claims.Expires {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"DELETE::[ERROR]": err.Error(),
+		})
+	}
+
+	if claims.DevPubAcc != true {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"DELETE::[ERROR]": err.Error(),
+		})
+	}
+
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -157,6 +185,27 @@ func (h *GameShopListHandler) Delete(c *fiber.Ctx) error {
 }
 
 func (h *GameShopListHandler) Update(c *fiber.Ctx) error {
+	now := time.Now().Unix()
+
+	claims, err := utils.ExtractTokenMetadata(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"DELETE::[ERROR]": err.Error(),
+		})
+	}
+
+	if now > claims.Expires {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"DELETE::[ERROR]": err.Error(),
+		})
+	}
+
+	if claims.DevPubAcc != true {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"DELETE::[ERROR]": err.Error(),
+		})
+	}
+
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{

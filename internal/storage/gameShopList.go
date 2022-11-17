@@ -49,10 +49,10 @@ func (s *GameShopListStorage) GetOne(id int) (*core.Game, error) {
 	return &game, nil
 }
 
-func (s *GameShopListStorage) GetAll() ([]*core.Game, error) {
+func (s *GameShopListStorage) GetAll(filter *core.GameFilter) ([]*core.Game, error) {
 	sql := `SELECT id, name, price, id_developers, 
-       id_publishers, id_categories, system_requirements, 
-       age_limit, description, release_date, version, rating FROM games`
+		id_publishers, id_categories, system_requirements, 
+		age_limit, description, release_date, version, rating FROM games`
 
 	games := make([]*core.Game, 0)
 
