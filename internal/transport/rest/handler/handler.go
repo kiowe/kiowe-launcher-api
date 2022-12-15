@@ -30,10 +30,12 @@ func (h *Handler) Init() *fiber.App {
 	api := h.app.Group("/api")
 	v1 := api.Group("/v1")
 
+	// Developer and publisher
 	dev := v1.Group("/dev")
 	dev.Post("/signup", h.DevSignupHandler.Signup)
 	dev.Post("/signin", h.DevSignupHandler.Signin)
 
+	// Games
 	game := v1.Group("/game")
 	game.Use(jwtware.New(jwtware.Config{
 		SigningKey:   []byte("secret"),
@@ -45,5 +47,6 @@ func (h *Handler) Init() *fiber.App {
 	game.Post("/add", h.GameShopListHandler.Add)
 	game.Patch("/:id", h.GameShopListHandler.Update)
 	game.Delete("/:id", h.GameShopListHandler.Delete)
+
 	return h.app
 }

@@ -19,6 +19,13 @@ type Game struct {
 	Rating       float64     `json:"rating"`
 }
 
+type GamePage struct {
+	Games    []*Game `json:"games"`
+	Page     int     `json:"page"`
+	Total    int     `json:"total"`
+	LastPage int     `json:"last_page"`
+}
+
 type CreateGame struct {
 	Name         string  `json:"name"`
 	Price        float64 `json:"price"`
@@ -57,17 +64,4 @@ type UpdateGameDTO struct {
 	ReleaseDate  *string  `json:"release_date,omitempty"`
 	Version      *string  `json:"version,omitempty"`
 	Rating       *float64 `json:"rating,omitempty"`
-}
-
-type GameFilter struct {
-	Name         *string  `query:"name"`
-	Price        *float64 `query:"price"`
-	IdDevelopers *int     `query:"id_developers"`
-	IdPublishers *int     `query:"id_publishers"`
-	IdCategories *int     `query:"id_categories"`
-	SystemReq    *string  `query:"system_req"`
-	AgeLimit     *string  `query:"age_limit"`
-	Description  *string  `query:"description"`
-	ReleaseDate  *string  `query:"release_date"`
-	Rating       *float64 `query:"rating"`
 }

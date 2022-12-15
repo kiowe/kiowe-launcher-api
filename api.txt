@@ -1,12 +1,16 @@
-game service
-GET    http://localhost:8081/api/v1/game/all                                                    - done
-GET    http://localhost:8081/api/v1/game/:id                                                    - done
+game service (done: 5/6)
+GET    http://localhost:8081/api/v1/game/all                                                    - DONE
+GET    http://localhost:8081/api/v1/game/:id                                                    - DONE
 GET    http://localhost:8081/api/v1/game/all?name=el%&price=3441&sort_order=price&sort_by=desc
-POST   http://localhost:8081/api/v1/game/add                                                    - done
-PATCH  http://localhost:8081/api/v1/game/:id                                                    - done
-DELETE http://localhost:8081/api/v1/game/:id                                                    - done
+POST   http://localhost:8081/api/v1/game/add                                                    - DONE
+PATCH  http://localhost:8081/api/v1/game/:id                                                    - DONE
+DELETE http://localhost:8081/api/v1/game/:id                                                    - DONE
 
-user service
+devpub service (done: 2/2)
+POST   https://localhost:8081/api/v1/dev/signup - DONE
+POST   https://localhost:8081/api/v1/dev/singin - DONE
+
+user service (done: 0/8)
 GET    http://localhost:8081/api/v1/user/:id
 GET    http://localhost:8081/api/v1/user/:id/friends
 GET    http://localhost:8081/api/v1/user/:id/groups

@@ -2,8 +2,13 @@ package storage
 
 import (
 	"context"
+	"errors"
+	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/kiowe/kiowe-launcher-api/internal/core"
+	"github.com/kiowe/kiowe-launcher-api/pkg/api/filter"
+	"github.com/kiowe/kiowe-launcher-api/pkg/api/pagination"
+	"github.com/kiowe/kiowe-launcher-api/pkg/api/sort"
 	"github.com/kiowe/kiowe-launcher-api/pkg/utils"
 	"log"
 )
@@ -49,15 +54,21 @@ func (s *GameShopListStorage) GetOne(id int) (*core.Game, error) {
 	return &game, nil
 }
 
-func (s *GameShopListStorage) GetAll(filter *core.GameFilter) ([]*core.Game, error) {
+func (s *GameShopListStorage) GetAll(filterOption []filter.Option,
+	sortOption sort.Option, pag pagination.Pagination) ([]*core.Game, error) {
 	sql := `SELECT id, name, price, id_developers, 
 		id_publishers, id_categories, system_requirements, 
 		age_limit, description, release_date, version, rating FROM games`
+
+	sql = filter.EnrichQueryWithFilter(sql, filterOption)
+	sql = sort.EnrichQueryWithSort(sql, sortOption)
+	sql = pagination.EnrichQueryWithPagination(sql, pag)
 
 	games := make([]*core.Game, 0)
 
 	rows, err := s.pool.Query(context.Background(), sql)
 	if err != nil {
+		log.Printf("[QUERY_ERROR]: %v", err)
 		return nil, err
 	}
 
@@ -66,7 +77,7 @@ func (s *GameShopListStorage) GetAll(filter *core.GameFilter) ([]*core.Game, err
 	for rows.Next() {
 		game := core.Game{}
 
-		if err := rows.Scan(
+		err := rows.Scan(
 			&game.Id,
 			&game.Name,
 			&game.Price,
@@ -79,7 +90,12 @@ func (s *GameShopListStorage) GetAll(filter *core.GameFilter) ([]*core.Game, err
 			&game.ReleaseDate,
 			&game.Version,
 			&game.Rating,
-		); err != nil {
+		)
+		if err := utils.ParsePgError(err); err != nil {
+			if err == pgx.ErrNoRows {
+				return nil, errors.New("[ERROR]: Product doesn't exists")
+			}
+			log.Printf("[ERROR]: %v", err)
 			return nil, err
 		}
 
@@ -87,6 +103,7 @@ func (s *GameShopListStorage) GetAll(filter *core.GameFilter) ([]*core.Game, err
 	}
 
 	if err := rows.Err(); err != nil {
+		log.Printf("[QUERY_ERROR]: %v", err)
 		return nil, err
 	}
 
@@ -201,4 +218,22 @@ func (s *GameShopListStorage) Update(id int, new *core.UpdateGameDTO) (*core.Gam
 	}
 
 	return &game, nil
+}
+
+func (s *GameShopListStorage) Count() (int, error) {
+	sql := `SELECT COUNT(*) FROM games`
+
+	var total int
+
+	if err := s.pool.QueryRow(context.Background(), sql).Scan(&total); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			log.Printf("[ERROR]: %v", err)
+			return 0, err
+		}
+
+		log.Printf("[ERROR]: %v", err)
+		return 0, err
+	}
+
+	return total, nil
 }
