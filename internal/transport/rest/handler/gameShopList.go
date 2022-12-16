@@ -9,7 +9,7 @@ import (
 
 type GameShopListService interface {
 	GetOne(id int) (*core.Game, error)
-	GetAll(filter *core.GameFilter) ([]*core.Game, error)
+	GetAll(queryParams map[string]string) (*core.GamePage, error)
 	Add(dto *core.CreateGame) error
 	Delete(id int) error
 	Update(id int, dto *core.UpdateGameDTO) (*core.Game, error)
@@ -57,36 +57,18 @@ func (h *GameShopListHandler) GetOne(c *fiber.Ctx) error {
 }
 
 func (h *GameShopListHandler) GetAll(c *fiber.Ctx) error {
-	now := time.Now().Unix()
+	queryParams := utils.GetQueryParams(c, "name", "price", "id_developers", "id_publishers",
+		"id_categories", "system_req", "age_limit", "description", "release_date", "rating", "page", "per_page",
+		"sort_by", "sort_order")
 
-	claims, err := utils.ExtractTokenMetadata(c)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"GETALL::[ERROR]": err.Error(),
-		})
-	}
-
-	if now > claims.Expires {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"GETALL::[ERROR]": err.Error(),
-		})
-	}
-
-	filter := new(core.GameFilter)
-	if err := c.QueryParser(filter); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"GETALL::[ERROR]": err.Error(),
-		})
-	}
-
-	games, err := h.service.GetAll(filter)
+	gamePage, err := h.service.GetAll(queryParams)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"GETALL::[ERROR]": err.Error(),
 		})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(games)
+	return c.Status(fiber.StatusOK).JSON(gamePage)
 }
 
 func (h *GameShopListHandler) Add(c *fiber.Ctx) error {

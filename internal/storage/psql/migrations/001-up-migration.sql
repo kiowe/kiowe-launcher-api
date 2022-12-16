@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS users_statuses
     name VARCHAR(20) NOT NULL UNIQUE
 );
 
--- api 2/2
 CREATE TABLE IF NOT EXISTS dev_pub_account
 (
     id          INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -16,7 +15,6 @@ CREATE TABLE IF NOT EXISTS dev_pub_account
     description VARCHAR(300) NULL
 );
 
--- api 5/6
 CREATE TABLE IF NOT EXISTS games
 (
     id                  INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
